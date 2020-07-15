@@ -7,9 +7,11 @@ import (
 	"strings"
 	"time"
 )
+
 const (
 	systemUser = "system"
 )
+
 // Below are various regex which equates commands which are sent as message by user
 var joinRegex = regexp.MustCompile(`^\\join+\s[a-z]+$`)
 var createRegex = regexp.MustCompile(`^\\create+\s[a-z]+$`)
@@ -25,11 +27,11 @@ type UserSession struct {
 	room         string
 	unsubscribed map[string]struct{}
 }
+
 // NewuserSession creates the user session object holding connection object and initializing few other parameters required for user session
 func NewUserSession(userID string, conn Conn) *UserSession {
 	return &UserSession{conn: conn, userId: userID, msg: make(chan MessageInfo), created: time.Now(), unsubscribed: make(map[string]struct{})}
 }
-
 
 // Unsubscribe this puts the user to unsubscribe in user object so that users can be skipped while sending the message
 func (u *UserSession) Unsubscribe(user string) error {
@@ -44,22 +46,22 @@ func (u *UserSession) Send() {
 	isExited := false
 	for !isExited {
 		isExit, msgToSend, err := u.ReadInput()
-		if err != nil{
+		if err != nil {
 			panic("some error reading the messages")
 		}
 		if len(msgToSend) == 0 {
-			isExited=isExit
+			isExited = isExit
 			continue
 		}
 		msgToSend = strings.TrimSpace(msgToSend)
-		msgInfo := MessageInfo{From: u.userId, Timestamp: time.Now(), Message: msgToSend,RoomID:u.room}
+		msgInfo := MessageInfo{From: u.userId, Timestamp: time.Now(), Message: msgToSend, RoomID: u.room}
 		switch {
 		case msgToSend == "\\exit":
 			u.msg <- msgInfo
 			chatUtil.GetSessions().DelUserSession(u.userId)
 			//check if user belonged to room
 			if len(u.room) > 0 {
-				chatUtil.GetRoomStorage().DeleteUser(u.room,u.userId)
+				chatUtil.GetRoomStorage().DeleteUser(u.room, u.userId)
 			}
 			msgInfo.From = systemUser
 			msgInfo.Message = fmt.Sprintf("%s logged out", u.userId)
@@ -89,7 +91,7 @@ func (u *UserSession) Send() {
 				msgInfo.IsRoomMessage = true
 				u.SendMessageToUsers(msgInfo)
 			}
-		case msgToSend == "\\help" :
+		case msgToSend == "\\help":
 			writeHelpCommands(u.conn)
 
 		case createRegex.MatchString(msgToSend):
@@ -114,10 +116,6 @@ func (u *UserSession) Send() {
 		isExited = isExit
 	}
 }
-
-
-
-
 
 // SendMessageToUsers this send the messages to recipeints via a channel on which users would be listening to
 // this checks if the message is intended for room or not
@@ -170,6 +168,7 @@ func (u *UserSession) JoinRoom(roomName string) error {
 	GetChatUtility().room.AddUser(roomName, u.userId)
 	return nil
 }
+
 //CreateRoom creates the room if not already exist
 func (u *UserSession) CreateRoom(roomName string) error {
 	for k, _ := range GetChatUtility().room.rooms {

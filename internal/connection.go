@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-
 // Conn : connection interface on which use can either exit,write or read message or data
 type Conn interface {
 	Close()
@@ -15,12 +14,11 @@ type Conn interface {
 	Write(info MessageInfo) error
 }
 
-
 // httpConnection implementation of connection interface
 type httpConnection struct {
 	msg       string
-	userId string
-	roomId string
+	userID    string
+	roomID    string
 	msgStore  *WebMessageStore
 	resp      string
 	IsCommand bool
@@ -28,7 +26,7 @@ type httpConnection struct {
 }
 
 func (a *httpConnection) Close() {
-	delete(a.msgStore.store,a.userId)
+	delete(a.msgStore.store, a.userID)
 	a.ch <- "session closed"
 	return
 }
@@ -71,6 +69,7 @@ func (a *TCPConnection) Read() (bool, string, error) {
 	s = strings.Trim(s, "\r\n")
 	return false, s, nil
 }
+
 // Write : this writes the msgs/error msgs to the users medium or terminal
 // Some of the msg that are not chat messages are also sent via IsOnlyMsgFieldToSend
 func (a *TCPConnection) Write(info MessageInfo) error {

@@ -13,6 +13,7 @@ import (
 
 // once is needed so as to initialize the object only once
 var once sync.Once
+
 // chatUtil is the heart of appication which takes care of loggin,storing session data
 // this also stores room data such as name of rooms which user are currently using which room
 var chatUtil *ChatUtility
@@ -23,9 +24,9 @@ type MessageInfo struct {
 	To                   string
 	Message              string
 	IsRoomMessage        bool
-	RoomID				string
+	RoomID               string
 	Timestamp            time.Time
-	IsOnlyMsgFieldToSend bool	`json:-`
+	IsOnlyMsgFieldToSend bool   `json:"-"`
 	Err                  string `json:"err,omitempty"`
 }
 
@@ -69,6 +70,8 @@ func NewChatUtility(log MessageLogger) *ChatUtility {
 	})
 	return chatUtil
 }
+
+// GetChatUtility
 func GetChatUtility() *ChatUtility {
 	return chatUtil
 }
@@ -78,6 +81,7 @@ type Roomstorage struct {
 	rooms map[string][]string
 }
 
+// GetRoomStorage get rooms occu
 func (c *ChatUtility) GetRoomStorage() *Roomstorage {
 	return c.room
 }
@@ -95,12 +99,12 @@ func (c *Roomstorage) AddRoom(roomName string) {
 	c.rooms[roomName] = make([]string, 0)
 }
 func (c *Roomstorage) DeleteUser(room, userID string) {
-	if val,ok := c.rooms[room];ok{
+	if val, ok := c.rooms[room]; ok {
 		for i, user := range val {
 			if user == userID {
-				val = append(val[:i],val[i+1:]...)
-			c.rooms[room] = 	val
-			break
+				val = append(val[:i], val[i+1:]...)
+				c.rooms[room] = val
+				break
 			}
 
 		}
@@ -139,6 +143,7 @@ func (a *InMemorySession) GetSessionData() map[string]*UserSession {
 	return a.sessionDB
 }
 
+
 func formatRooms(rooms []string) string {
 	var s bytes.Buffer
 	for i, val := range rooms {
@@ -166,14 +171,14 @@ func getUserToSendMsg(roomID string) []*UserSession {
 }
 
 func writeHelpCommands(conn Conn) {
-	msgInfo := MessageInfo{IsOnlyMsgFieldToSend:true}
-	if _,ok := conn.(*httpConnection);ok {
-		payload,_ := json.Marshal(commands)
-	msgInfo.Message = string(payload)
+	msgInfo := MessageInfo{IsOnlyMsgFieldToSend: true}
+	if _, ok := conn.(*httpConnection); ok {
+		payload, _ := json.Marshal(commands)
+		msgInfo.Message = string(payload)
 		conn.Write(msgInfo)
 		return
 	}
 	for k, v := range commands {
-		conn.Write(MessageInfo{IsOnlyMsgFieldToSend:true,Message:k+":"+v})
+		conn.Write(MessageInfo{IsOnlyMsgFieldToSend: true, Message: k + ":" + v})
 	}
 }

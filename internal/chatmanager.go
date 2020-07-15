@@ -12,8 +12,8 @@ var commands = map[string]string{
 	"\\rooms":                 "\t\t\tlist all the rooms/channels",
 	"\\create <room_name>":    "\tcreate a new room",
 	"\\join <room_name>":      "\tjoin a room",
-	"\\exitroom" : "\t\tremoves users from the room",
-	"\\help":      "\t\t\tprints all commands",
+	"\\exitroom":              "\t\tremoves users from the room",
+	"\\help":                  "\t\t\tprints all commands",
 }
 
 // ChatManager this is a singleton struct which spawns a go routines
@@ -29,8 +29,8 @@ func NewChatManager() *ChatManager {
 // CreateUserSession creates the user session and also updates the data in chatutil struct
 func (a *ChatManager) CreateUserSession(userID string, conn Conn) {
 	userSession := NewUserSession(userID, conn)
-	if v ,ok := conn.(*httpConnection);ok{
-		userSession.room = v.roomId
+	if v, ok := conn.(*httpConnection); ok {
+		userSession.room = v.roomID
 	}
 	chatUtil.GetSessions().AddUserSession(userSession)
 	go userSession.Send()

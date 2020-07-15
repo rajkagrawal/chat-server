@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/rajaanova/chat-server/internal/config"
 	"net/http"
 
 	"github.com/rajaanova/chat-server/internal"
@@ -12,35 +13,24 @@ import (
 	"os"
 )
 
-// Declaring the variable that need to be passed in using command line parameters
-// for e.g  go run cmd/main.go -port=8888
-var (
-	serverIP *string
-	portNum  *string
-	httpPortNum *string
-	logFile  *string
-)
-
-// init : initializing the parmeters using flag utility, if any parameters is not passed then use default parameters mentioned below
-func init() {
-	serverIP = flag.String("ip", "127.0.0.1", "ip address to listen")
-	portNum = flag.String("port", "5050", "port number on which  to listen")
-	httpPortNum = flag.String("httpport", "8080", "http port number on which  to listen")
-	logFile = flag.String("logfile", "./message.log", "log file location")
-	flag.Parse()
-}
-
 func main() {
-	//Create the listener to listen from telnet connection
-	listener, err := net.Listen("tcp", *serverIP+":"+*portNum)
+	configFile := flag.String("configfile", "./config.json", "config file location")
+	flag.Parse()
+	appConfig, err := config.BS{}.Boot(*configFile)
 	if err != nil {
-		panic(fmt.Sprintf("not able to listen on  %v:%v error: %v ", *serverIP, *portNum, err))
+		//panicing since configuration should be properly loaded.
+		panic(fmt.Sprintf("not able bootstrap the configuration %v", err))
+	}
+	//Create the listener to listen from telnet connection
+	listener, err := net.Listen("tcp", appConfig.ServerIP+":"+appConfig.PortNum)
+	if err != nil {
+		panic(fmt.Sprintf("not able to listen on  %v:%v error: %v ", appConfig.ServerIP, appConfig.PortNum, err))
 	}
 	defer listener.Close()
 	log.Info("listening on: ", listener.Addr())
 
 	// Getting the file description of log file and setting the required flag to make it appendible and create the file if not present
-	f, err := os.OpenFile(*logFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
+	f, err := os.OpenFile(appConfig.LogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 	if err != nil {
 		panic(fmt.Sprintf("error while adding file to logger %v", err))
 	}
@@ -50,7 +40,7 @@ func main() {
 	clientManager := internal.NewChatManager()
 	webMsgStore := internal.NewWebStore()
 	// integrating the http api to integrate with chat system
-	httpHanlder := internal.HttpClientManager{clientManager, webMsgStore}
+	httpHanlder := internal.HTTPClientManager{ChatManager: clientManager, MsgStore: webMsgStore}
 	// various router or handlers for http api
 	router := mux.NewRouter()
 	router.HandleFunc("/post", httpHanlder.Message).Methods(http.MethodPost)
@@ -58,12 +48,12 @@ func main() {
 	router.HandleFunc("/command", httpHanlder.Command).Methods(http.MethodPost)
 	// run http servier
 	go func() {
-		err = http.ListenAndServe(":"+*httpPortNum, router)
+		err = http.ListenAndServe(appConfig.HTTPServerIP+":"+appConfig.HTTPPortNum, router)
 		if err != nil {
 			panic(err)
 		}
 	}()
-	//listen accept loop
+	//listen to telnet connection
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
