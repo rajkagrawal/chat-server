@@ -7,7 +7,6 @@ messages sent/received. The client should be responsible to filter out the messa
 
 
 
-
 #curl request examples
 
 Request body use same template for all the type of request which are user_id,room_id,message
@@ -52,3 +51,14 @@ time : 2020-07-15T08:52:17, senderID : raj, msg : ok ravi
 time : 2020-07-15T08:52:30, senderID : htpuser, msg : hey raj
 </pre>
 
+#Approach taken while writing the application
+
+1. Since this application is multiclient a loop is initiated to listen to the connection request.
+2. For every connection run 2 go routines one to receive client input and another to send the messages on chat/terminal window.
+3. While sending the messages, need to take care of messages which are like command(added switch case and regex to handle specific command) and another is normal messages that needs to be sent to connected client<br/>
+4. For http api since the connection is not long live, to maintain the chats to be delivere a cache is maintained. Whenever a http client fetches this record client has to filter on their part the appropriate message to be displayed.<br/>
+
+#Further developments
+1. Rest api can be exposed to demarcate the message to be returned.
+2. Few more functionality such as active users, \subscribe(unsubscribed user can be subscribed back) command can be added.
+3. Cleanup tasks such as few goroutines are still lurking behind which might add to leakage, some policy regarding cache msg expriation can be taken care of.
