@@ -34,7 +34,7 @@ _~/chat-server$_ go run cmd/main.go -configfile=./config.json
 # run the chat server with docker
 
 
-_~/chat-server$_ docker build . -t chatserver
+_~/chat-server$_ docker build . -t chatserver<br/>
 _~/chat-server$_ docker run -p 5050:5050 -p 8080:8080 --name=rajchat --rm --mount type=bind,source="$(pwd)"/logs,target=/logs  chatserver
  
 # telnet commands examples 

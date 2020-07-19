@@ -4,7 +4,7 @@ go:
 
 script:
   - make build
-  - make tests
+
 
 
 # Build only MASTER pushes and build ALL PRs
