@@ -15,10 +15,4 @@ WORKDIR /
 COPY --from=builder /executeable .
 COPY --from=builder /config.json .
 
-
-
-
 ENTRYPOINT ["/executeable","-configfile=/config.json"]
-
-#docker build . -t rajexe
-#docker run -p 5050:5050 -p 8080:8080 --name=rajchat --rm --mount type=bind,source="/home/raj/Desktop/poc/chat-server/logs",target="/logs"  rajexe
