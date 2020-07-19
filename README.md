@@ -1,4 +1,4 @@
-#Application workings :
+# Application workings :
 
 When a user(not connected in room) sends a message all the connected individual client(not joined the room) will receive the messages.<br/>
 When a user(connected in room) sends a message all the client connected(joined) in a room will receive the messages.<br/>
@@ -7,7 +7,7 @@ messages sent/received. The client should be responsible to filter out the messa
 
 
 
-#curl request examples
+# curl request examples
 
 Request body use same template for all the type of request which are user_id,room_id,message
 
@@ -24,19 +24,19 @@ curl "http://localhost:8080/command" -d '{"user_id":"username","room_id":"roomna
 when a user wants to query the message : 
 curl "http://localhost:8080/fetch" -d '{"user_id":"username","room_id":"roomname", "message":""}'
 
-#run the chat server without docker 
+# run the chat server without docker 
 
 Go to the root dir i.e ~/chat-server <br/>
 Make necessary changes in config file i.e config.json <br/>
 ~/chat-server$  go run cmd/main.go -configfile=./config.json
 
-#run the chat server with docker
+# run the chat server with docker
 
 
 ~/chat-server$ docker build . -t rajexe
 ~/chat-server$ docker run -p 5050:5050 -p 8080:8080 --name=rajchat --rm --mount type=bind,source="$(pwd)"/logs,target=/logs  rajexe
  
-#telnet commands examples 
+# telnet commands examples 
 $ telnet 127.0.0.1 5050
 <pre>
 Trying 127.0.0.1...
@@ -58,14 +58,14 @@ time : 2020-07-15T08:52:17, senderID : raj, msg : ok ravi
 time : 2020-07-15T08:52:30, senderID : htpuser, msg : hey raj
 </pre>
 
-#Approach taken while writing the application
+# Approach taken while writing the application
 
 1. Since this application is multiclient a loop is initiated to listen to the connection request.
 2. For every connection run 2 go routines one to receive client input and another to send the messages on chat/terminal window.
 3. While sending the messages, need to take care of messages which are like command(added switch case and regex to handle specific command) and another is normal messages that needs to be sent to connected client<br/>
 4. For http api since the connection is not long live, to maintain the chats to be delivere a cache is maintained. Whenever a http client fetches this record client has to filter on their part the appropriate message to be displayed.<br/>
 
-#Further developments
+# Further developments
 1. Rest api can be exposed to demarcate the message to be returned.
 2. Few more functionality such as active users, \subscribe(unsubscribed user can be subscribed back) command can be added.
 3. Cleanup tasks such as few goroutines are still lurking behind which might add to leakage, some policy regarding cache msg expriation can be taken care of.

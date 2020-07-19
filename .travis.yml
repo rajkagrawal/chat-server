@@ -1,0 +1,11 @@
+language: go
+go:
+  - 1.14.x
+
+script:
+  - make build
+  - make tests
+
+
+# Build only MASTER pushes and build ALL PRs
+if: branch = master OR type = pull_request
