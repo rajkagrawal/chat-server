@@ -26,15 +26,16 @@ curl "http://localhost:8080/fetch" -d '{"user_id":"username","room_id":"roomname
 
 # run the chat server without docker 
 
-Go to the root dir i.e ~/chat-server <br/>
-Make necessary changes in config file i.e config.json <br/>
-~/chat-server$  go run cmd/main.go -configfile=./config.json
+1. Go to the root dir i.e ~/chat-server <br/>
+2. Make necessary changes in config file i.e config.json <br/>
+
+_~/chat-server$_ go run cmd/main.go -configfile=./config.json
 
 # run the chat server with docker
 
 
-~/chat-server$ docker build . -t rajexe
-~/chat-server$ docker run -p 5050:5050 -p 8080:8080 --name=rajchat --rm --mount type=bind,source="$(pwd)"/logs,target=/logs  rajexe
+_~/chat-server$_ docker build . -t chatserver
+_~/chat-server$_ docker run -p 5050:5050 -p 8080:8080 --name=rajchat --rm --mount type=bind,source="$(pwd)"/logs,target=/logs  chatserver
  
 # telnet commands examples 
 $ telnet 127.0.0.1 5050
