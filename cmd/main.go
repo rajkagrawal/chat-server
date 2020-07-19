@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/rajaanova/chat-server/internal/config"
+	"github.com/rajaanova/chat-server/app"
+	"github.com/rajaanova/chat-server/app/config"
 	"net/http"
 
-	"github.com/rajaanova/chat-server/internal"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
@@ -35,12 +35,12 @@ func main() {
 		panic(fmt.Sprintf("error while adding file to logger %v", err))
 	}
 	// creating the objects required
-	fileLogger := internal.NewFileLogger(f)
-	internal.NewChatUtility(fileLogger)
-	clientManager := internal.NewChatManager()
-	webMsgStore := internal.NewWebStore()
+	fileLogger := app.NewFileLogger(f)
+	app.NewChatUtility(fileLogger)
+	clientManager := app.NewChatManager()
+	webMsgStore := app.NewWebStore()
 	// integrating the http api to integrate with chat system
-	httpHanlder := internal.HTTPClientManager{ChatManager: clientManager, MsgStore: webMsgStore}
+	httpHanlder := app.HTTPClientManager{ChatManager: clientManager, MsgStore: webMsgStore}
 	// various router or handlers for http api
 	router := mux.NewRouter()
 	router.HandleFunc("/post", httpHanlder.Message).Methods(http.MethodPost)
