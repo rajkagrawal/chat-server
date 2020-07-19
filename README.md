@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rajaanova/chat-server.svg?branch=master)](https://travis-ci.org/rajaanova/chat-server)
+
 # Application workings :
 
 When a user(not connected in room) sends a message all the connected individual client(not joined the room) will receive the messages.<br/>
