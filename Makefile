@@ -4,6 +4,7 @@ current_dir := $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_L
 build:
 	go build ./...
 
+# run : This sets up the docker to build the image
 .PHONY: run
 run:
 	@docker build . -t chatserver
